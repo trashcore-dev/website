@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trashcore Multi-Site Dashboard</title>
+<style>
+/* --- Keep all your previous styles unchanged --- */
+body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: linear-gradient(135deg, #4caf50, #81c784); position: relative; overflow-x: hidden; }
+body::before, body::after { content: ''; position: absolute; width: 200%; height: 200px; background: black; border-radius: 50%; opacity: 0.15; animation: wave 10s linear infinite; z-index: 0; }
+body::before { top: -100px; left: -50%; }
+body::after { bottom: -100px; right: -50%; animation-delay: 5s; }
+@keyframes wave { 0% { transform: translateX(0); } 50% { transform: translateX(25%); } 100% { transform: translateX(0); } }
+
+header { background-color: rgba(0,0,0,0.7); color: white; padding: 20px; text-align: center; position: relative; z-index: 1; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+h1 { margin: 0; }
+
+.container { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; padding: 20px; position: relative; z-index: 1; }
+
+.site-card { border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); padding: 50px 15px; transition: transform 0.3s, box-shadow 0.3s; color: white; position: relative; overflow: hidden; text-align: center; min-height: 180px; display: flex; flex-direction: column; justify-content: center; }
+.site-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.5); }
+.site-card h2 { margin: 0 0 15px 0; font-size: 20px; }
+.site-card a.button { background: linear-gradient(135deg, #e74c3c, #ff6f61); color: white; padding: 10px 20px; border: none; border-radius: 8px; text-decoration: none; font-weight: bold; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+.site-card a.button:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.3); }
+.card1 { background: linear-gradient(135deg, #ff6f61, #ffb347); }
+.card2 { background: linear-gradient(135deg, #6a11cb, #2575fc); }
+.card3 { background: linear-gradient(135deg, #43cea2, #185a9d); }
+.card4 { background: linear-gradient(135deg, #f7971e, #ffd200); }
+
+.site-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%); transform: rotate(0deg); animation: glowRotate 8s linear infinite; z-index: 0; }
+.site-card > * { position: relative; z-index: 1; }
+@keyframes glowRotate { 0% { transform: rotate(0deg); } 50% { transform: rotate(180deg); } 100% { transform: rotate(360deg); } }
+
+.dashboard-buttons { display:flex; justify-content:flex-end; gap:10px; margin: 20px; }
+.dashboard-buttons button { padding:10px 15px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; color:white; transition: transform 0.2s, box-shadow 0.2s; }
+.dashboard-buttons button:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+.refresh-btn { background: linear-gradient(135deg,#4caf50,#81c784); }
+.exit-btn { background: linear-gradient(135deg,#e74c3c,#ff6f61); }
+
+.comments { background: linear-gradient(135deg,#ffffff,#e0f7fa); padding: 20px; margin: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 1; position: relative; }
+.comments h2 { margin-top: 0; color: #333; }
+.comment-form { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+.comment-form input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ccc; }
+.comment-form button { background: linear-gradient(135deg,#4caf50,#81c784); border: none; padding: 10px 15px; border-radius: 8px; color: white; cursor: pointer; font-weight: bold; transition: transform 0.2s, box-shadow 0.2s; }
+.comment-form button:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+
+.comment { background: linear-gradient(135deg,#f4f4f4,#e0f2f1); padding: 12px; border-radius: 8px; margin-bottom: 10px; transition: transform 0.2s; }
+.comment:hover { transform: translateY(-2px); }
+.comment strong { display:block; color:#2c3e50; margin-bottom:2px; }
+.comment small { display:block; color:#777; margin-bottom:5px; }
+.comment p { margin:0 0 5px; }
+.actions { display:flex; gap:10px; margin-top:5px; }
+.actions button { background:none; border:none; cursor:pointer; font-size:14px; transition: color 0.2s; }
+.actions button:hover { color:#00796b; text-decoration: underline; }
+.actions button.active { font-weight:bold; color:#4caf50; }
+
+footer { text-align:center; padding:20px; background-color: rgba(0,0,0,0.7); color:white; position:relative; z-index:1; }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Trashcore Multi-Site Dashboard</h1>
+    <p>Access multiple websites from one place</p>
+</header>
+
+<div class="container">
+    <div class="site-card card1">
+        <h2>TRASHCORE-Bot Web</h2>
+        <a href="https://trashcore.zone.id/" target="_blank" class="button">Open in New Tab</a>
+    </div>
+    <div class="site-card card2">
+        <h2>Website 2</h2>
+        <a href="https://www.example.com" target="_blank" class="button">Open in New Tab</a>
+    </div>
+    <div class="site-card card3">
+        <h2>Website 3</h2>
+        <a href="https://www.example2.com" target="_blank" class="button">Open in New Tab</a>
+    </div>
+    <div class="site-card card4">
+        <h2>Website 4</h2>
+        <a href="https://www.example3.com" target="_blank" class="button">Open in New Tab</a>
+    </div>
+</div>
+
+<div class="dashboard-buttons">
+    <button class="refresh-btn" onclick="location.reload()">🔄 Refresh</button>
+    <button class="exit-btn" onclick="window.close()">❌ Exit</button>
+</div>
+
+<div class="comments">
+    <h2>Comments</h2>
+    <div class="comment-form">
+        <input type="text" id="nameInput" placeholder="Your name">
+        <input type="text" id="commentInput" placeholder="Write a comment...">
+        <button onclick="addComment()">Post</button>
+    </div>
+    <div id="commentList"></div>
+</div>
+
+<footer>
+    &copy; 2025 Trashcore Dashboard
+</footer>
+
+<script>
+// Load comments from localStorage on page load
+document.addEventListener("DOMContentLoaded", () => {
+    const storedComments = JSON.parse(localStorage.getItem("comments") || "[]");
+    storedComments.forEach(c => createCommentElement(c.name, c.text, c.likes, c.dislikes, c.time));
+});
+
+function saveCommentToStorage(comment) {
+    const storedComments = JSON.parse(localStorage.getItem("comments") || "[]");
+    storedComments.unshift(comment); // newest first
+    localStorage.setItem("comments", JSON.stringify(storedComments));
+}
+
+function updateStorage() {
+    const commentList = document.getElementById("commentList");
+    const comments = [];
+    Array.from(commentList.children).forEach(c => {
+        comments.push({
+            name: c.dataset.name,
+            text: c.querySelector("p").textContent,
+            likes: parseInt(c.querySelector(".like-btn").dataset.count),
+            dislikes: parseInt(c.querySelector(".dislike-btn").dataset.count),
+            time: c.querySelector("small").textContent
+        });
+    });
+    localStorage.setItem("comments", JSON.stringify(comments));
+}
+
+function addComment() {
+    const nameField=document.getElementById('nameInput');
+    const commentField=document.getElementById('commentInput');
+    const name=nameField.value.trim();
+    const text=commentField.value.trim();
+    if(!name||!text) return;
+
+    createCommentElement(name, text);
+
+    saveCommentToStorage({name, text, likes:0, dislikes:0, time: "Posted on "+new Date().toLocaleString()});
+
+    nameField.value=""; commentField.value="";
+}
+
+function createCommentElement(name, text, likes=0, dislikes=0, time=null) {
+    const commentList = document.getElementById("commentList");
+    const commentDiv = document.createElement("div"); 
+    commentDiv.className="comment"; 
+    commentDiv.dataset.name=name;
+
+    const nameEl = document.createElement("strong"); nameEl.textContent=name;
+    const timeEl = document.createElement("small"); timeEl.textContent=time || "Posted on "+new Date().toLocaleString();
+    const p = document.createElement("p"); p.textContent=text;
+
+    const actions = document.createElement("div"); actions.className="actions";
+
+    const likeBtn = document.createElement("button"); likeBtn.className="like-btn"; likeBtn.textContent=`👍 ${likes}`; likeBtn.dataset.count=likes; likeBtn.dataset.active="false";
+    const dislikeBtn = document.createElement("button"); dislikeBtn.className="dislike-btn"; dislikeBtn.textContent=`👎 ${dislikes}`; dislikeBtn.dataset.count=dislikes; dislikeBtn.dataset.active="false";
+
+    likeBtn.onclick = () => {
+        let count = parseInt(likeBtn.dataset.count);
+        let dislikeCount = parseInt(dislikeBtn.dataset.count);
+        if(likeBtn.dataset.active === "false"){ count++; likeBtn.dataset.active= "true"; likeBtn.classList.add("active");
+            if(dislikeBtn.dataset.active === "true"){ 
+                dislikeCount--; 
+                dislikeBtn.dataset.active = "false"; 
+                dislikeBtn.classList.remove("active"); 
+                dislikeBtn.dataset.count = dislikeCount; 
+                dislikeBtn.textContent = `👎 ${dislikeCount}`; 
+            }
+        } else { 
+            count--; 
+            likeBtn.dataset.active = "false"; 
+            likeBtn.classList.remove("active"); 
+        }
+        likeBtn.dataset.count = count; 
+        likeBtn.textContent = `👍 ${count}`;
+        updateStorage();
+    };
+
+    dislikeBtn.onclick = () => {
+        let count = parseInt(dislikeBtn.dataset.count);
+        let likeCount = parseInt(likeBtn.dataset.count);
+        if(dislikeBtn.dataset.active === "false"){ 
+            count++; 
+            dislikeBtn.dataset.active = "true"; 
+            dislikeBtn.classList.add("active");
+            if(likeBtn.dataset.active === "true"){ 
+                likeCount--; 
+                likeBtn.dataset.active = "false"; 
+                likeBtn.classList.remove("active"); 
+                likeBtn.dataset.count = likeCount; 
+                likeBtn.textContent = `👍 ${likeCount}`; 
+            }
+        } else { 
+            count--; 
+            dislikeBtn.dataset.active = "false"; 
+            dislikeBtn.classList.remove("active"); 
+        }
+        dislikeBtn.dataset.count = count; 
+        dislikeBtn.textContent = `👎 ${count}`;
+        updateStorage();
+    };
+
+    const editBtn = document.createElement("button"); editBtn.textContent="✏️ Edit";
+    editBtn.onclick = () => {
+        const currentText = p.textContent;
+        const inputField = document.createElement("input");
+        inputField.type = "text";
+        inputField.value = currentText;
+
+        const saveBtn = document.createElement("button");
+        saveBtn.textContent = "💾 Save";
+
+        p.replaceWith(inputField);
+        editBtn.replaceWith(saveBtn);
+
+        saveBtn.onclick = () => {
+            if(inputField.value.trim() !== ""){
+                p.textContent = inputField.value.trim();
+                timeEl.textContent = "Edited on "+new Date().toLocaleString();
+            }
+            inputField.replaceWith(p);
+            saveBtn.replaceWith(editBtn);
+            updateStorage();
+        };
+    };
+
+    const deleteBtn = document.createElement("button"); deleteBtn.textContent="🗑️ Delete";
+    deleteBtn.onclick = () => {
+        commentDiv.remove();
+        updateStorage();
+    };
+
+    actions.appendChild(likeBtn);
+    actions.appendChild(dislikeBtn);
+    actions.appendChild(editBtn);
+    actions.appendChild(deleteBtn);
+
+    commentDiv.appendChild(nameEl);
+    commentDiv.appendChild(timeEl);
+    commentDiv.appendChild(p);
+    commentDiv.appendChild(actions);
+
+    commentList.prepend(commentDiv);
+}
+</script>
+
+</body>
+</html>
