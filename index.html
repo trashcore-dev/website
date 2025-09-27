@@ -6,13 +6,14 @@
 <title>Trashcore Multi-Site Dashboard</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#2196f3">
+
 <style>
 /* --- Body and background --- */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background: linear-gradient(135deg, #2196f3, #4caf50); /* Blue to green */
+    background: linear-gradient(135deg, #2196f3, #4caf50);
     position: relative;
     overflow-x: hidden;
 }
@@ -174,7 +175,6 @@ footer { text-align:center; padding:20px; background-color: rgba(0,0,0,0.7); col
 </head>
 <body>
 
-<!-- Autoplay music -->
 <audio id="bgMusic" autoplay loop></audio>
 
 <header>
@@ -210,11 +210,10 @@ footer { text-align:center; padding:20px; background-color: rgba(0,0,0,0.7); col
 
 <footer>&copy; 2025 Trashcore Dashboard</footer>
 
-<!-- Install Button -->
 <button id="installBtn">📥 Install App</button>
 
 <script>
-// --- Firebase config ---
+// --- Firebase ---
 const firebaseConfig = {
     apiKey: "YOUR_API_KEY",
     authDomain: "trash-fd503.firebaseapp.com",
@@ -232,21 +231,20 @@ const songs = [
     "https://files.catbox.moe/abcd12.mp3",
     "https://files.catbox.moe/efgh34.mp3"
 ];
-let lastSongIndex = localStorage.getItem("lastSongIndex");
-lastSongIndex = lastSongIndex !== null ? parseInt(lastSongIndex) : -1;
-let songIndex;
-do {
-    songIndex = Math.floor(Math.random() * songs.length);
-} while(songIndex === lastSongIndex && songs.length > 1);
+const lastSong = localStorage.getItem("lastSongIndex");
+let songIndex = Math.floor(Math.random() * songs.length);
+if (lastSong !== null && songs.length > 1 && songIndex == lastSong) {
+    songIndex = (songIndex + 1) % songs.length;
+}
+localStorage.setItem("lastSongIndex", songIndex);
 const bgMusic = document.getElementById("bgMusic");
 bgMusic.src = songs[songIndex];
 bgMusic.play().catch(e => console.log("Autoplay blocked:", e));
-localStorage.setItem("lastSongIndex", songIndex);
 
-// --- PWA Install Prompt ---
+// --- PWA Install ---
 let deferredPrompt;
 const installBtn = document.getElementById("installBtn");
-window.addEventListener('beforeinstallprompt', (e) => {
+window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
     deferredPrompt = e;
     installBtn.style.display = 'block';
@@ -259,105 +257,66 @@ installBtn.addEventListener('click', async () => {
     deferredPrompt = null;
 });
 
-// --- Real-time comments listener ---
+// --- Comments ---
 db.collection("comments").orderBy("timestamp","desc").onSnapshot(snapshot => {
     const commentList = document.getElementById("commentList");
     commentList.innerHTML = "";
     snapshot.forEach(doc => {
         const c = doc.data();
-        createCommentElement(
-            doc.id,
-            c.name,
-            c.text,
-            c.likes || 0,
-            c.dislikes || 0,
-            new Date(c.timestamp?.seconds*1000 || Date.now()).toLocaleString()
+        createCommentElement(doc.id, c.name, c.text, c.likes||0, c.dislikes||0,
+            new Date(c.timestamp?.seconds*1000||Date.now()).toLocaleString()
         );
     });
 });
-
-// --- Add new comment ---
-function addComment() {
-    const name = document.getElementById('nameInput').value.trim();
-    const text = document.getElementById('commentInput').value.trim();
-    if(!name || !text) return;
-    db.collection("comments").add({
-        name,
-        text,
-        likes:0,
-        dislikes:0,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    document.getElementById('nameInput').value="";
-    document.getElementById('commentInput').value="";
+function addComment(){
+    const name=document.getElementById("nameInput").value.trim();
+    const text=document.getElementById("commentInput").value.trim();
+    if(!name||!text) return;
+    db.collection("comments").add({name,text,likes:0,dislikes:0,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
+    document.getElementById("nameInput").value="";
+    document.getElementById("commentInput").value="";
 }
-
-// --- Create comment element ---
-function createCommentElement(id, name, text, likes=0, dislikes=0, time=null){
-    const commentList = document.getElementById("commentList");
-    const commentDiv = document.createElement("div");
-    commentDiv.className = "comment";
-    commentDiv.dataset.id = id;
-
-    const nameEl = document.createElement("strong"); nameEl.textContent=name;
-    const timeEl = document.createElement("small"); timeEl.textContent=time;
-    const p = document.createElement("p"); p.textContent=text;
-
-    const actions = document.createElement("div"); actions.className="actions";
-
-    const likeBtn = document.createElement("button"); likeBtn.textContent=`👍 ${likes}`;
-    likeBtn.onclick = () => updateVote(id,'like');
-
-    const dislikeBtn = document.createElement("button"); dislikeBtn.textContent=`👎 ${dislikes}`;
-    dislikeBtn.onclick = () => updateVote(id,'dislike');
-
-    const editBtn = document.createElement("button"); editBtn.textContent="✏️ Edit";
-    editBtn.onclick = () => editComment(id,p,timeEl);
-
-    const deleteBtn = document.createElement("button"); deleteBtn.textContent="🗑️ Delete";
-    deleteBtn.onclick = () => db.collection("comments").doc(id).delete();
-
+function createCommentElement(id,name,text,likes=0,dislikes=0,time=null){
+    const commentList=document.getElementById("commentList");
+    const commentDiv=document.createElement("div");
+    commentDiv.className="comment"; commentDiv.dataset.id=id;
+    const nameEl=document.createElement("strong"); nameEl.textContent=name;
+    const timeEl=document.createElement("small"); timeEl.textContent=time;
+    const p=document.createElement("p"); p.textContent=text;
+    const actions=document.createElement("div"); actions.className="actions";
+    const likeBtn=document.createElement("button"); likeBtn.textContent=`👍 ${likes}`; likeBtn.onclick=()=>updateVote(id,'like');
+    const dislikeBtn=document.createElement("button"); dislikeBtn.textContent=`👎 ${dislikes}`; dislikeBtn.onclick=()=>updateVote(id,'dislike');
+    const editBtn=document.createElement("button"); editBtn.textContent="✏️ Edit"; editBtn.onclick=()=>editComment(id,p,timeEl);
+    const deleteBtn=document.createElement("button"); deleteBtn.textContent="🗑️ Delete"; deleteBtn.onclick=()=>db.collection("comments").doc(id).delete();
     actions.append(likeBtn,dislikeBtn,editBtn,deleteBtn);
     commentDiv.append(nameEl,timeEl,p,actions);
     commentList.prepend(commentDiv);
 }
-
-// --- Update likes/dislikes globally ---
 function updateVote(id,type){
-    const commentRef = db.collection("comments").doc(id);
+    const commentRef=db.collection("comments").doc(id);
     commentRef.get().then(doc=>{
         if(doc.exists){
-            let data = doc.data();
+            let data=doc.data();
             if(type==='like') data.likes=(data.likes||0)+1;
             else data.dislikes=(data.dislikes||0)+1;
             commentRef.update({likes:data.likes,dislikes:data.dislikes});
         }
     });
 }
-
-// --- Edit comment ---
 function editComment(id,pEl,timeEl){
-    const input = document.createElement("input"); input.value=pEl.textContent;
-    const saveBtn = document.createElement("button"); saveBtn.textContent="💾 Save";
-
+    const input=document.createElement("input"); input.value=pEl.textContent;
+    const saveBtn=document.createElement("button"); saveBtn.textContent="💾 Save";
     pEl.replaceWith(input); input.after(saveBtn);
-
-    saveBtn.onclick = () => {
-        const newText = input.value.trim();
-        if(newText){
-            db.collection("comments").doc(id).update({text:newText});
-            timeEl.textContent = "Edited on "+new Date().toLocaleString();
-        }
-        input.replaceWith(pEl);
-        saveBtn.remove();
+    saveBtn.onclick=()=>{
+        const newText=input.value.trim();
+        if(newText){ db.collection("comments").doc(id).update({text:newText}); timeEl.textContent="Edited on "+new Date().toLocaleString();}
+        input.replaceWith(pEl); saveBtn.remove();
     };
 }
 
-// --- Register Service Worker ---
+// --- Service Worker ---
 if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('sw.js').then(()=>{
-        console.log('Service Worker registered');
-    });
+    navigator.serviceWorker.register('sw.js').then(()=>console.log('Service Worker registered'));
 }
 </script>
 </body>
